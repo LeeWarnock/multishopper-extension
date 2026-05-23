@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multishopper Web Launcher</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --card: #ffffff;
+      --ink: #111827;
+      --muted: #6b7280;
+      --brand: #0a7d2c;
+      --line: #d1d5db;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: radial-gradient(circle at top right, #eaf5ec, transparent 38%), var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+    }
+    h1 { margin: 0 0 8px; font-size: 1.5rem; }
+    p { color: var(--muted); margin: 0 0 16px; line-height: 1.5; }
+    .row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+    input[type="text"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 16px;
+    }
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .retailers {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 8px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    label {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fcfcfd;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    .links {
+      display: grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .link-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+    }
+    .muted { color: var(--muted); font-size: 0.9rem; }
+    a { color: #0a5b91; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Multishopper Web Launcher</h1>
+    <p>
+      This GitHub Pages version is optimized for phones. It opens each retailer
+      directly in its own page. The extension-only split iframe view is not available on the web.
+    </p>
+
+    <div class="row">
+      <input id="query" type="text" placeholder="Search product, e.g. iphone 15 pro" />
+      <button id="build">Build Links</button>
+    </div>
+
+    <div class="retailers" id="retailers"></div>
+
+    <div class="muted" id="status">Pick retailers and build links.</div>
+    <section class="links" id="links"></section>
+  </main>
+
+  <script>
+    const defaults = [
+      { id: "amazon", name: "Amazon", searchUrl: "https://www.amazon.com/s?k={query}" },
+      { id: "walmart", name: "Walmart", searchUrl: "https://www.walmart.com/search?q={query}" },
+      { id: "target", name: "Target", searchUrl: "https://www.target.com/s?searchTerm={query}" },
+      { id: "ebay", name: "eBay", searchUrl: "https://www.ebay.com/sch/i.html?_nkw={query}" },
+      { id: "bestbuy", name: "Best Buy", searchUrl: "https://www.bestbuy.com/site/searchpage.jsp?st={query}" },
+      { id: "costco", name: "Costco", searchUrl: "https://www.costco.com/CatalogSearch?keyword={query}" }
+    ];
+
+    const retailersEl = document.getElementById("retailers");
+    const linksEl = document.getElementById("links");
+    const statusEl = document.getElementById("status");
+    const queryEl = document.getElementById("query");
+
+    function renderRetailers() {
+      retailersEl.innerHTML = "";
+      for (const r of defaults) {
+        const label = document.createElement("label");
+        label.innerHTML = `<input type="checkbox" checked value="${r.id}"> ${r.name}`;
+        retailersEl.appendChild(label);
+      }
+    }
+
+    function selectedRetailers() {
+      const checked = [...retailersEl.querySelectorAll("input:checked")].map(c => c.value);
+      return defaults.filter(r => checked.includes(r.id));
+    }
+
+    function buildLinks() {
+      const query = queryEl.value.trim();
+      const chosen = selectedRetailers();
+      linksEl.innerHTML = "";
+
+      if (!query) {
+        statusEl.textContent = "Enter a search query first.";
+        return;
+      }
+      if (chosen.length === 0) {
+        statusEl.textContent = "Select at least one retailer.";
+        return;
+      }
+
+      statusEl.textContent = `Showing ${chosen.length} link(s) for \"${query}\".`;
+
+      for (const r of chosen) {
+        const url = r.searchUrl.replace("{query}", encodeURIComponent(query));
+        const card = document.createElement("div");
+        card.className = "link-card";
+        card.innerHTML = `
+          <strong>${r.name}</strong>
+          <a href="${url}" target="_blank" rel="noopener noreferrer">Open</a>
+        `;
+        linksEl.appendChild(card);
+      }
+
+      const pageUrl = new URL(window.location.href);
+      pageUrl.searchParams.set("q", query);
+      pageUrl.searchParams.set("r", chosen.map(r => r.id).join(","));
+      history.replaceState({}, "", pageUrl.toString());
+    }
+
+    document.getElementById("build").addEventListener("click", buildLinks);
+    queryEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") buildLinks();
+    });
+
+    renderRetailers();
+
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q");
+    const rs = (params.get("r") || "").split(",").filter(Boolean);
+    if (q) queryEl.value = q;
+    if (rs.length) {
+      [...retailersEl.querySelectorAll("input")].forEach(cb => {
+        cb.checked = rs.includes(cb.value);
+      });
+    }
+    if (q) buildLinks();
+  </script>
+</body>
+</html>

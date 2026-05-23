@@ -2,6 +2,18 @@
 
 Compare product prices across multiple retailers in a split-view layout.
 
+## GitHub Pages (Phone Access)
+
+You can use the hosted web launcher from any phone:
+
+- `https://YOUR_USERNAME.github.io/multishopper-extension/`
+
+Notes:
+
+- The hosted web version opens retailer searches in separate tabs.
+- The extension-only iframe split view depends on Chrome extension permissions and cannot be fully reproduced on GitHub Pages.
+- Main entry point is `index.html`.
+
 ## Features
 
 - **Side Panel Interface** - Search for products from the browser sidebar
