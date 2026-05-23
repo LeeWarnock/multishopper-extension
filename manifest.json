@@ -1,0 +1,40 @@
+{
+  "manifest_version": 3,
+  "name": "The Cheapest Product",
+  "version": "1.0.0",
+  "description": "Compare product prices across multiple retailers in a split-view",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "declarativeNetRequest",
+    "tabs",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_title": "The Cheapest Product"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "remove_headers",
+        "enabled": true,
+        "path": "rules.json"
+      }
+    ]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["splitview.html", "splitview.js", "splitview.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

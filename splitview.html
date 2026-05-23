@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Cheapest Product - Compare</title>
+    <link rel="stylesheet" href="splitview.css">
+</head>
+<body>
+    <!-- Header Bar -->
+    <header class="header">
+        <div class="header-left">
+            <h1>💰 The Cheapest Product</h1>
+            <span id="searchQuery" class="search-query"></span>
+        </div>
+        <div class="header-right">
+            <button id="layoutBtn" class="header-btn" title="Toggle layout">
+                <span class="icon">⊞</span>
+            </button>
+            <button id="refreshAllBtn" class="header-btn" title="Refresh all">
+                <span class="icon">↻</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Split View Container -->
+    <main id="splitContainer" class="split-container">
+        <!-- Tiles will be dynamically added here -->
+    </main>
+
+    <script src="splitview.js"></script>
+</body>
+</html>
